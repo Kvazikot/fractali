@@ -469,7 +469,7 @@ int PICK(float P[],int n)
     }
     return 0;
 }
-const int K_MAX=4;
+
 float c_pap[K_MAX][6] = {{0.0,0.0,0.0,0.3,0.4987,0.0070}, \
                  {0.1,0.4330,-0.1732,0.2500,0.4445,0.1559}, \
                  {0.1,-0.433,0.1732,0.2500,0.4478,0.0014}, \
@@ -484,6 +484,7 @@ float c_cristal[K_MAX][6] = {{0.2550,0,0,0.2550,0.3726,0.6714},
                          {0.2550,0,0,0.2550,0.1146,0.2232},
                          {0.2550,0,0,0.2550,0.6306,0.2232},
                          {0.37,-0.6420,0.6420,0.3700,0.6356,-0.0061} };
+
 
 void calc_weights(float C[][6], float P[],int kMax)
 {
@@ -660,11 +661,26 @@ void RenderThread::run()
     }
     if( npage == 4 )
     {
-        cif_algo(&painter, c_cristal, K_MAX, pdlg->ui.nPoints->value(), resultImage.width(), resultImage.height());
+        float c[K_MAX][6];
+        parse_matrix_edit(c);
+        cif_algo(&painter, c, K_MAX, pdlg->ui.nPoints->value(), resultImage.width(), resultImage.height());
         //cif_algo(&painter, c_list, K_MAX, pdlg->ui.nPoints->value(), resultImage.width(), resultImage.height());
         //cif_algo(&painter, c_pap,4, pdlg->ui.nPoints->value(), resultImage.width(), resultImage.height());
     }
 	emit renderedImage(resultImage);
+}
+
+void RenderThread::parse_matrix_edit(float c[K_MAX][6])
+{
+    QString text = pdlg->ui.matrixEdit->toPlainText();
+    QStringList lines = text.split("\n");
+    for(int i=0; i < lines.length(); i++)
+    {
+        QStringList line_parts = lines[i].split(" ", QString::SplitBehavior::SkipEmptyParts);
+        if(line_parts.length() < 6) continue;
+        for(int j=0; j < 6; j++)
+          c[i][j] = line_parts[j].toFloat();
+    }
 }
 
 void fractals::on_drawButton_clicked()
@@ -1003,4 +1019,42 @@ void fractals::on_tabWidget_currentChanged(int index)
 void fractals::on_reinitWorld_pressed()
 {
 
+}
+
+
+void fractals::on_savedCIFsCombo_activated(const QString &arg1)
+{
+    ui.matrixEdit->clear();
+    for(int k=0; k < K_MAX; k++)
+    {
+        QString s;
+        for(int i=0; i < 6; i++)
+        {
+           char str [128];
+           if(arg1 == "Crystal")
+             sprintf(str, "%4.4f", c_cristal[k][i]);
+           else if (arg1 == "Leaf")
+             sprintf(str, "%4.4f", c_list[k][i]);
+           else if (arg1 == "Pap")
+               sprintf(str, "%4.4f", c_pap[k][i]);
+           s+=QString(str) + "  ";
+        }
+        ui.matrixEdit->append(s);
+    }
+}
+
+void fractals::on_randomMatrixButton_clicked()
+{
+    ui.matrixEdit->clear();
+    for(int k=0; k < K_MAX; k++)
+    {
+        QString s;
+        for(int i=0; i < 6; i++)
+        {
+           char str [128];
+           sprintf(str, "%4.4f", (float)rand()/RAND_MAX);
+           s+=QString(str) + "  ";
+        }
+        ui.matrixEdit->append(s);
+    }
 }

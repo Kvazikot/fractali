@@ -96,7 +96,7 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>4</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab_3">
         <attribute name="title">
@@ -207,15 +207,15 @@
             </sizepolicy>
            </property>
            <property name="currentIndex">
-            <number>2</number>
+            <number>4</number>
            </property>
            <widget class="QWidget" name="page">
             <property name="geometry">
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>98</width>
-              <height>28</height>
+              <width>100</width>
+              <height>30</height>
              </rect>
             </property>
             <attribute name="label">
@@ -295,8 +295,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>98</width>
-              <height>28</height>
+              <width>100</width>
+              <height>30</height>
              </rect>
             </property>
             <attribute name="label">
@@ -425,7 +425,7 @@
               <x>0</x>
               <y>0</y>
               <width>309</width>
-              <height>450</height>
+              <height>446</height>
              </rect>
             </property>
             <attribute name="label">
@@ -630,8 +630,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>98</width>
-              <height>28</height>
+              <width>309</width>
+              <height>446</height>
              </rect>
             </property>
             <attribute name="label">
@@ -643,12 +643,12 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>98</width>
-              <height>28</height>
+              <width>309</width>
+              <height>446</height>
              </rect>
             </property>
             <attribute name="label">
-             <string>Leaf</string>
+             <string>CIF</string>
             </attribute>
             <widget class="QSpinBox" name="nPoints">
              <property name="geometry">
@@ -678,6 +678,54 @@
              <property name="text">
               <string>N точек</string>
              </property>
+            </widget>
+            <widget class="QPushButton" name="randomMatrixButton">
+             <property name="geometry">
+              <rect>
+               <x>20</x>
+               <y>60</y>
+               <width>111</width>
+               <height>23</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Random matrix</string>
+             </property>
+            </widget>
+            <widget class="QTextEdit" name="matrixEdit">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>100</y>
+               <width>311</width>
+               <height>151</height>
+              </rect>
+             </property>
+            </widget>
+            <widget class="QComboBox" name="savedCIFsCombo">
+             <property name="geometry">
+              <rect>
+               <x>160</x>
+               <y>60</y>
+               <width>121</width>
+               <height>22</height>
+              </rect>
+             </property>
+             <item>
+              <property name="text">
+               <string>Leaf</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Crystal</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Pap</string>
+              </property>
+             </item>
             </widget>
            </widget>
           </widget>
@@ -1474,7 +1522,7 @@
      <x>0</x>
      <y>0</y>
      <width>1268</width>
-     <height>21</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>

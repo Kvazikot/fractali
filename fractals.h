@@ -7,6 +7,8 @@
 #include "lsystem.h"
 #include "ui_fractals.h"
 
+const int K_MAX=4;
+
 class QResizeEvent;
 
 struct Complex
@@ -69,6 +71,8 @@ private slots:
     void on_reinitWorld_clicked();
     void on_tabWidget_currentChanged(int index);
     void on_reinitWorld_pressed();
+    void on_savedCIFsCombo_activated(const QString &arg1);
+    void on_randomMatrixButton_clicked();
 };
 
 
@@ -83,6 +87,7 @@ public:
 	void DrawAbstract(int r, int cmax,int npix, int npiy);
 	bool CheckIdx(int i, int j);
     RenderThread(fractals* p);
+    void parse_matrix_edit(float c[K_MAX][6]);
 	void run();
 
 signals:
