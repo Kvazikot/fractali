@@ -1001,3 +1001,8 @@ void fractals::on_tabWidget_currentChanged(int index)
     }
 
 }
+
+void fractals::on_reinitWorld_pressed()
+{
+
+}

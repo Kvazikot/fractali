@@ -3,6 +3,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "fractals.h"
+#include "livewidget.h"
 
 double myatan(double x)
 {
@@ -43,6 +44,7 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);    
     fractals w;
     w.show();
+
     //qDebug() << calculate_pi();
 	return a.exec();
 }

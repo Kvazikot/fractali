@@ -68,6 +68,7 @@ private slots:
     void on_fastDrawCB_clicked();
     void on_reinitWorld_clicked();
     void on_tabWidget_currentChanged(int index);
+    void on_reinitWorld_pressed();
 };
 
 
