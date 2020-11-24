@@ -469,17 +469,18 @@ int PICK(float P[],int n)
     }
     return 0;
 }
-
-float c_pap[4][6] = {{0.0,0.0,0.0,0.3,0.4987,0.0070}, \
+const int K_MAX=4;
+float c_pap[K_MAX][6] = {{0.0,0.0,0.0,0.3,0.4987,0.0070}, \
                  {0.1,0.4330,-0.1732,0.2500,0.4445,0.1559}, \
                  {0.1,-0.433,0.1732,0.2500,0.4478,0.0014}, \
                   {0.7,0.0,0.0,0.7,0.1496,0.2962}};
-float c_list[4][6] = { {0,0,0,0,0,0}, \
+
+float c_list[K_MAX][6] = { {0,0,0,0,0,0}, \
                        {0,0,0,0,0,0}, \
                        {0.4,-0.3,0.06,0.6,0.3433,0}, \
                        {-0.8,-0.1867,0.1371,0.8,1.1,0.1} };
 
-float c_cristal[4][6] = {{0.2550,0,0,0.2550,0.3726,0.6714},
+float c_cristal[K_MAX][6] = {{0.2550,0,0,0.2550,0.3726,0.6714},
                          {0.2550,0,0,0.2550,0.1146,0.2232},
                          {0.2550,0,0,0.2550,0.6306,0.2232},
                          {0.37,-0.6420,0.6420,0.3700,0.6356,-0.0061} };
@@ -494,8 +495,6 @@ void calc_weights(float C[][6], float P[],int kMax)
         float b = C[k][1];
         float c = C[k][2];
         float d = C[k][3];
-        float e = C[k][4];
-        float f = C[k][5];
         detA[k] = fabs(a * d - b * c);
         SUMdetA+=detA[k];
     }
@@ -546,11 +545,12 @@ void cif_algo(QPainter* painter, float C[][6], int kMax, int level, int w, int h
 {
     float P[4]={0,0,0,0.00};
     float x,y,x0,y0;
-    float a,b,c,d; // координаты окна
+    float a,b,c,d;
     int kHist[4]={0,0,0,0};
+
     calc_weights(C,P,kMax);
     fit_rects = new GeneCurveFitter(P);
-
+    fit_rects->DrawInitalRefinment(painter, 200, 200);
 
     a = 0; b = 0;
     c = w; d = h;
@@ -660,10 +660,8 @@ void RenderThread::run()
     }
     if( npage == 4 )
     {
-        //cif_algo(&painter, c_list, 2, pdlg->ui.nPoints->value(), resultImage.width(), resultImage.height());
-        //fr->DrawInitalRefinment(&painter, resultImage.width(), resultImage.height());
-
-        cif_algo(&painter, c_list, 4, pdlg->ui.nPoints->value(), resultImage.width(), resultImage.height());
+        cif_algo(&painter, c_cristal, K_MAX, pdlg->ui.nPoints->value(), resultImage.width(), resultImage.height());
+        //cif_algo(&painter, c_list, K_MAX, pdlg->ui.nPoints->value(), resultImage.width(), resultImage.height());
         //cif_algo(&painter, c_pap,4, pdlg->ui.nPoints->value(), resultImage.width(), resultImage.height());
     }
 	emit renderedImage(resultImage);
