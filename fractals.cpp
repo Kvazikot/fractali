@@ -22,7 +22,7 @@
 #include "livewidget.h"
 
 fractals* pdlg2;
-GeneCurveFitter*  fit_rects;
+RectsFitter*  fit_rects;
 CellularAutomatas* cellular;
 LiveWidget*        livewidget = 0;
 bool	  DoAbort;
@@ -490,7 +490,7 @@ int monte_carlo_method(float P[],int n)
             if( Y <=  (*irc).bottom() && Y >=  (*irc).top())
             {
                   hit = true;
-                  return cnt;
+                  return fit_rects->index2index[cnt];
             }
            }
        }
@@ -512,8 +512,8 @@ void cif_algo(QPainter* painter, float C[][6], int kMax, int level, int w, int h
     int kHist[4]={0,0,0,0};
 
     calc_weights(C,P,kMax);
-    fit_rects = new GeneCurveFitter(P);
-    fit_rects->DrawInitalRefinment(painter, 200, 200);
+    fit_rects = new RectsFitter(P);
+    fit_rects->DrawInitalRefinment(painter, 200, 500);
 
     a = 0; b = 0;
     c = w; d = h;

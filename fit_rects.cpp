@@ -7,13 +7,11 @@
 #include <random>
 #include "fit_rects.h"
 
-GeneCurveFitter::GeneCurveFitter(float P[4])
+RectsFitter::RectsFitter(float P[4])
 {
     a = 3;
     b = 4;
     c = 3;
-    //double U = (double)rand()/RAND_MAX;
-    //qDebug() << 10*U;
     m = 4;
     n = 4;
     s1 = a * b;
@@ -21,9 +19,9 @@ GeneCurveFitter::GeneCurveFitter(float P[4])
     s3 = m * (a + c);
     s4 = n * (a + c);
     double sum = s1+s2+s3+s4;
-    tSum = 72;
+    MAX_VALUE = 300;
 
-    //РІРµРєС‚РѕСЂ РѕС‚РЅРѕС€РµРЅРёР№ РїР»РѕС‰Р°РґРµР№
+    //вектор отношений площадей
     w.resize(4);
     tw.resize(4);
     w[0] = 45./100.;
@@ -73,7 +71,7 @@ void get_from_population(int i, double Population[][5], double c[5])
     c[4] = Population[i][4];
 }
 
-void GeneCurveFitter::crossover(double p1[5], double p2[5], double c[5])
+void RectsFitter::crossover(double p1[5], double p2[5], double c[5])
 {
    int board = rand()%4;
    bool orr = rand()%101 < 50;
@@ -104,8 +102,8 @@ void GeneCurveFitter::crossover(double p1[5], double p2[5], double c[5])
           { c[0] = p2[0]; c[1] = p2[1]; c[2] = p2[2]; c[3] = p2[3]; c[4] = p1[4]; }
        break;
    }
-   //РјСѓС‚Р°С†РёРё
-   int max = tSum+1;
+   //мутации
+   int max = MAX_VALUE+1;
    for(int i=0; i<5; i++)
      if (rand() % 101 < 5) c[i] = rand() % max ;
 }
@@ -126,8 +124,8 @@ double getVectorDiff(std::vector<double>& w, std::vector<double>& tw)
     return diff;
 }
 
-// СЃСЂРµРґРЅСЏСЏ РїСЂРёСЃРїРѕСЃРѕР±Р»РµРЅРЅРѕСЃС‚СЊ fitness РїРѕС‚РѕРјРєРѕРІ
-double GeneCurveFitter::get_fitness(double Population[][5])
+// средняя приспособленность fitness потомков
+double RectsFitter::get_fitness(double Population[][5])
 {
     double fitness=0;
     double c[5];
@@ -159,7 +157,7 @@ double GeneCurveFitter::get_fitness(double Population[][5])
     return fitness;
 }
 
-int GeneCurveFitter::get_index(double val) {
+int RectsFitter::get_index(double val) {
     double last = 0;
     for(int i=0;i<MAX_POPULATION;i++) {
         if (last <= val && val <= likehood[i]) return i;
@@ -193,16 +191,16 @@ bool compare_by_square(QRectF& rc1, QRectF& rc2)
 }
 
 //a * b + c * b + m * (a+c) + n * (a + c) = tSum;
-void GeneCurveFitter::Solve()
+void RectsFitter::Solve()
 {
-    // РєРѕСЌС„ Р»РµР¶Р°С‚ РЅР° РѕС‚СЂРµР·РєРµ [0..72]
+    // коэф лежат на отрезке [0..72]
     srand((unsigned)time(NULL));
 
-    //РіРµРЅРµСЂРёСЂСѓРµРј РїРµСЂРІСѓСЋ РїРѕРїСѓР»СЏС†РёСЋ
+    //генерируем первую популяцию
 
     for(int i=0; i < MAX_POPULATION; i++)
     {
-        int max = tSum+1;
+        int max = MAX_VALUE+1;
         a = rand()%max;
         b = rand()%max;
         c = rand()%max;
@@ -218,7 +216,7 @@ void GeneCurveFitter::Solve()
     while(fitness > 0.0001)
     {
         generation++;
-        //СЂР°СЃСЃС‚РѕСЏРЅРёРµ РґРѕ tSum = РєРѕСЌС„С„. РІС‹Р¶РёРІР°РµРјРѕСЃС‚Рё
+        //расстояние до tSum = коэфф. выживаемости
         double c[5];
 
         fitness = get_fitness(Population);
@@ -227,7 +225,7 @@ void GeneCurveFitter::Solve()
 
         qDebug("gen %d fitness %f ", generation, fitness);
 
-        // РІС‹Р±РёСЂР°РµРј 5 РїР°СЂ СЂРѕРґРёС‚РµР»РµР№ Сѓ РЅРёС… Р±СѓРґРµС‚ РїРѕ РѕРґРЅРѕРјСѓ СЂРµР±РµРЅРєСѓ
+        // выбираем 5 пар родителей у них будет по одному ребенку
         double p1[5];
         double p2[5];
 
@@ -253,7 +251,7 @@ void GeneCurveFitter::Solve()
             setin_population2(i, c, NextPopulation);
         }
 
-        //РєРѕРїРёСЂРѕРІР°РЅРёРµ РїРѕРїСѓР»СЏС†РёРё
+        //копирование популяции
         for(int i=0; i < MAX_POPULATION; i++)
         {
             for(int j=0; j < 5; j++)
@@ -285,6 +283,9 @@ void GeneCurveFitter::Solve()
     scaled_squares.push_back(rc1);
     scaled_squares.push_back(rc3);
     scaled_squares.push_back(rc2);
+
+    qDebug();
+
     QRectF minXrect = *std::min_element(scaled_squares.begin(), scaled_squares.end(), [](QRectF& a, QRectF& b)
     {
         return a.left() < b.left();
@@ -309,12 +310,18 @@ void GeneCurveFitter::Solve()
     qDebug("x[%f,%f] y[%f,%f]",minX,maxX,minY,maxY);
     //std::random_device rd;
     //std::mt19937 g(rd());
-    //sort(scaled_squares.begin(), scaled_squares.end(),compare_by_square);
-    //std::shuffle(scaled_squares.begin(), scaled_squares.end(),g);
+    sort(scaled_squares.begin(), scaled_squares.end(),compare_by_square);
+
+    std::vector<double> w_copy;
+    std::copy(w.begin(),w.end(),std::back_inserter(w_copy));
+    std::sort(w_copy.begin(),w_copy.end(),std::less<double>());
+    index2index.resize(w.size());
+    for(int i=0 ; i < w.size(); i++)
+        index2index[i] = i;
 
 }
 
-void GeneCurveFitter::DrawInitalRefinment(QPainter* painter, int w, int h)
+void RectsFitter::DrawInitalRefinment(QPainter* painter, int w, int h)
 {
     painter->save();
     painter->translate(w/4,h/4);
