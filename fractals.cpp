@@ -13,6 +13,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <array>
 #include "fractals.h"
 #include "print.h"
 #include "fit_rects.h"
@@ -48,8 +49,6 @@ fractals::fractals(QWidget *parent)
     startTimer(10);
     ui.toolBox->setCurrentIndex(4);
     on_drawButton_clicked();
-    im1.load("ud_DSC06137.JPG");
-    im2.load("ud_DSC06136.JPG");
 
 }
 
@@ -388,6 +387,7 @@ int randCol(float alpha)
 
 void fractals::updatePixmap(const QImage &resultImage)
 {
+    ui.graphicsView->scene()->clear();
     ui.graphicsView->scene()->addPixmap(QPixmap::fromImage(resultImage));
     //ui.label->setPixmap(QPixmap::fromImage(resultImage));
 }
@@ -425,49 +425,10 @@ std::normal_distribution<float> distribution(0.5,0.2);
 
 int PICK(float P[],int n)
 {
-   //return monte_carlo_method(P, n, 100000);
-   static int check_list[10];
-    float U = (float)rand()/RAND_MAX;
-
-    for(int i=0; i<n; i++) check_list[i] = 0;
-
-    int cnt = 0;
-
-
-    //U = distribution(generator);
-
-    int nSeq = rand()%seqs.size();
-    for(int j=0; j<n; j++)
-    {
-
-        int i = j;//seqs[nSeq][j];
-        //qDebug("1-Pi = %f U = %f",(1 - P[i]),U);
-        if(P[i] > 0.5  )
-        {
-           if(U > (1 - P[i]))
-           {
-               check_list[cnt] = i;
-               cnt++;
-               //return i;
-           }
-        }
-        else
-           if(U < P[i])
-           {
-               check_list[cnt] = i;
-               cnt++;
-               //return i;
-           }
-
-    }
-
-
-    if( cnt!=0 )
-    {
-        int i = rand()%(cnt);
-        return check_list[i];
-    }
-    return 0;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::discrete_distribution<> d({P[0]*1000, P[1]*1000,  P[2]*1000, P[3]*1000});
+    return d(gen);
 }
 
 float c_pap[K_MAX][6] = {{0.0,0.0,0.0,0.3,0.4987,0.0070}, \
@@ -515,7 +476,6 @@ int monte_carlo_method(float P[],int n)
 {
    float X, Y;
 
-
    bool hit = false;
    //while( !hit && --iterations > 0 )
    {
@@ -525,14 +485,16 @@ int monte_carlo_method(float P[],int n)
        int cnt=0;
        for(irc=fit_rects->scaled_squares.begin(); irc!=fit_rects->scaled_squares.end(); irc++, cnt++)
        {
-           if( X > (*irc).left() && X < (*irc).right())
-            if( Y <  (*irc).bottom() && Y >  (*irc).top())
+           if( X >= (*irc).left() && X <= (*irc).right())
+           {
+            if( Y <=  (*irc).bottom() && Y >=  (*irc).top())
             {
                   hit = true;
                   return cnt;
+            }
            }
-
        }
+       qDebug("point (%f,%f) missed");
        return -1;
 
 
@@ -559,7 +521,7 @@ void cif_algo(QPainter* painter, float C[][6], int kMax, int level, int w, int h
     x0 = 1.1; y0 = 1.1;
     for(int i=0; i < 100; i++ )
     {
-        k = monte_carlo_method(P, kMax);//PICK(P, kMax);
+        k = monte_carlo_method(P, kMax);
         if(k==-1) continue;
         x = (C[k][0] * x0 + C[k][1]*y0 + C[k][4]);
         y = (C[k][2] * x0 + C[k][3]*y0 + C[k][5]);
@@ -569,11 +531,15 @@ void cif_algo(QPainter* painter, float C[][6], int kMax, int level, int w, int h
     //qDebug("n1=%d P=%f",n1,(float)n1/1000);
 
     totalIterations = 0;
-
+    int misses = 0;
     for(int i=0; i < level; i++)
     {
-        k = monte_carlo_method(P, kMax);
-        if(k==-1) continue;
+        k = monte_carlo_method(P, kMax); //PICK(P, kMax);
+        if(k==-1)
+        {
+            misses++;
+            continue;
+        }
         totalIterations++;
         kHist[k]++;
         x = (C[k][0] * x0 + C[k][1]*y0 + C[k][4]);
@@ -585,7 +551,7 @@ void cif_algo(QPainter* painter, float C[][6], int kMax, int level, int w, int h
         y0 = y;
     }
     for(int i=0; i<4; i++)
-        qDebug("kHist[k]=%f",(float)kHist[i]/totalIterations);
+        qDebug("kHist[%d]=%f misses=%d",i,(float)kHist[i]/totalIterations, misses);
     qDebug("totalIterations=%d", totalIterations);
 
 }
@@ -661,7 +627,11 @@ void RenderThread::run()
     }
     if( npage == 4 )
     {
-        float c[K_MAX][6];
+        float c[K_MAX][6] = { {0,0,0,0,0,0}, \
+                               {0,0,0,0,0,0}, \
+                               {0.4,-0.3,0.06,0.6,0.3433,0}, \
+                               {-0.8,-0.1867,0.1371,0.8,1.1,0.1} };
+
         parse_matrix_edit(c);
         cif_algo(&painter, c, K_MAX, pdlg->ui.nPoints->value(), resultImage.width(), resultImage.height());
         //cif_algo(&painter, c_list, K_MAX, pdlg->ui.nPoints->value(), resultImage.width(), resultImage.height());
@@ -674,7 +644,9 @@ void RenderThread::parse_matrix_edit(float c[K_MAX][6])
 {
     QString text = pdlg->ui.matrixEdit->toPlainText();
     QStringList lines = text.split("\n");
-    for(int i=0; i < lines.length(); i++)
+    int n = lines.length();
+    if(n > K_MAX) n = K_MAX;
+    for(int i=0; i < n; i++)
     {
         QStringList line_parts = lines[i].split(" ", QString::SplitBehavior::SkipEmptyParts);
         if(line_parts.length() < 6) continue;
@@ -701,6 +673,8 @@ void fractals::on_drawButton_clicked()
 		RenderThread* th = new RenderThread(this);
 	    connect(th, SIGNAL(renderedImage(const QImage &)),
             this, SLOT(updatePixmap(const QImage &)));
+        connect(th, &QThread::finished, th, &QObject::deleteLater);
+
 		th->start();
 
 
@@ -1057,4 +1031,25 @@ void fractals::on_randomMatrixButton_clicked()
         }
         ui.matrixEdit->append(s);
     }
+}
+
+void fractals::on_addLineBut_clicked()
+{
+    float angle1 = qDegreesToRadians(ui.angle1SB->value());
+    float angle2 = qDegreesToRadians(ui.angle2SB->value());
+    float Tx = ((float)rand()/RAND_MAX);
+    float Ty = ((float)rand()/RAND_MAX);
+
+    char str [128];
+    sprintf(str, "%4.4f %4.4f %4.4f %4.4f %4.4f %4.4f", cos(angle1), -sin(angle1), sin(angle2), cos(angle2), Tx, Ty );
+    ui.matrixEdit->append(QString(str));
+
+}
+
+void fractals::on_pushButton_3_clicked()
+{
+    ui.angle1SB->setValue(60 * (float)rand()/RAND_MAX); //in degrees
+    ui.angle2SB->setValue(60 * (float)rand()/RAND_MAX); //in degrees
+    ui.TxSB->setValue((rand()/RAND_MAX));
+    ui.TySB->setValue((rand()/RAND_MAX) );
 }

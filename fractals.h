@@ -73,6 +73,8 @@ private slots:
     void on_reinitWorld_pressed();
     void on_savedCIFsCombo_activated(const QString &arg1);
     void on_randomMatrixButton_clicked();
+    void on_addLineBut_clicked();
+    void on_pushButton_3_clicked();
 };
 
 
@@ -82,7 +84,7 @@ class RenderThread : public QThread
 
 public:
 	fractals* pdlg;
-	QImage resultImage;
+    QImage resultImage;
 	void DrawKamTorus(double square, double ax);
 	void DrawAbstract(int r, int cmax,int npix, int npiy);
 	bool CheckIdx(int i, int j);

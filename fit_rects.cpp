@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QPainter>
 #include <cmath>
+#include <random>
 #include "fit_rects.h"
 
 GeneCurveFitter::GeneCurveFitter(float P[4])
@@ -284,7 +285,32 @@ void GeneCurveFitter::Solve()
     scaled_squares.push_back(rc1);
     scaled_squares.push_back(rc3);
     scaled_squares.push_back(rc2);
+    QRectF minXrect = *std::min_element(scaled_squares.begin(), scaled_squares.end(), [](QRectF& a, QRectF& b)
+    {
+        return a.left() < b.left();
+    });
+    QRectF maxXrect = *std::max_element(scaled_squares.begin(), scaled_squares.end(), [](QRectF& a, QRectF& b)
+    {
+        return a.right() < b.right();
+    });
+    QRectF minYrect = *std::min_element(scaled_squares.begin(), scaled_squares.end(), [](QRectF& a, QRectF& b)
+    {
+        return a.top() < b.top();
+    });
+    QRectF maxYrect = *std::max_element(scaled_squares.begin(), scaled_squares.end(), [](QRectF& a, QRectF& b)
+    {
+        return a.bottom() > b.bottom();
+    });
+
+    minX = minXrect.left();
+    maxX = maxXrect.right();
+    minY = minYrect.top();
+    maxY = minYrect.bottom();
+    qDebug("x[%f,%f] y[%f,%f]",minX,maxX,minY,maxY);
+    //std::random_device rd;
+    //std::mt19937 g(rd());
     //sort(scaled_squares.begin(), scaled_squares.end(),compare_by_square);
+    //std::shuffle(scaled_squares.begin(), scaled_squares.end(),g);
 
 }
 

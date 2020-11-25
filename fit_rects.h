@@ -13,6 +13,7 @@ public:
     double a,b,c,m,n;    // коэффициенты
     double s1,s2,s3,s4;
     int  tSum;
+    float minX, minY, maxX, maxY;
     std::vector<QRectF>  scaled_squares;
     std::vector<double> w;        // текущий вектор
     std::vector<double> tw;       //целевой вектор

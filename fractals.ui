@@ -727,6 +727,103 @@
               </property>
              </item>
             </widget>
+            <widget class="QWidget" name="">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>270</y>
+               <width>277</width>
+               <height>125</height>
+              </rect>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_2">
+              <item row="4" column="2">
+               <widget class="QDoubleSpinBox" name="TySB">
+                <property name="decimals">
+                 <number>3</number>
+                </property>
+                <property name="minimum">
+                 <double>-10000.000000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>10000.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.002000000000000</double>
+                </property>
+                <property name="value">
+                 <double>0.520000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QDoubleSpinBox" name="TxSB">
+                <property name="decimals">
+                 <number>3</number>
+                </property>
+                <property name="minimum">
+                 <double>-10000.000000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>10000.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.002000000000000</double>
+                </property>
+                <property name="value">
+                 <double>0.520000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0" colspan="3">
+               <widget class="QLabel" name="label_13">
+                <property name="text">
+                 <string>angle                               Tx                       Ty</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QDoubleSpinBox" name="angle2SB">
+                <property name="decimals">
+                 <number>4</number>
+                </property>
+                <property name="minimum">
+                 <double>-360.000000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>360.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1" colspan="2">
+               <widget class="QPushButton" name="addLineBut">
+                <property name="text">
+                 <string>AddLine</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QDoubleSpinBox" name="angle1SB">
+                <property name="decimals">
+                 <number>4</number>
+                </property>
+                <property name="minimum">
+                 <double>-360.000000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>360.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QPushButton" name="pushButton_3">
+                <property name="text">
+                 <string>Random</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
            </widget>
           </widget>
          </item>
